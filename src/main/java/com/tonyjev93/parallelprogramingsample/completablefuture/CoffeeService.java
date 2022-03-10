@@ -4,6 +4,7 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 
+import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.Executor;
 import java.util.concurrent.Executors;
 import java.util.concurrent.Future;
@@ -24,8 +25,19 @@ public class CoffeeService implements CoffeeUseCase {
     }
 
     @Override
-    public Future<Integer> getPriceAsync(String name) {
-        return null;
+    public CompletableFuture<Integer> getPriceAsync(String name) {
+        log.info("비동기 호출 방식으로 가격 조회 시작");
+
+        CompletableFuture<Integer> future = new CompletableFuture<>();
+
+        new Thread(() -> {
+            log.info("새로운 쓰레드로 작업 시작");
+            Integer price = coffeeRepository.getPriceByName(name);
+            log.info("새로운 쓰레드로 작업 완료");
+            future.complete(price);
+        }).start();
+
+        return future;
     }
 
     @Override

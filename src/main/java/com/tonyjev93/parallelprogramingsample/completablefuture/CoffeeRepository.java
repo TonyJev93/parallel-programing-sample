@@ -8,6 +8,7 @@ import java.util.Map;
 
 @Repository
 public class CoffeeRepository {
+    public static final int WAIT_TIME = 1000;
     private Map<String, Coffee> coffeeMap = new HashMap<>();
 
     @PostConstruct
@@ -19,7 +20,7 @@ public class CoffeeRepository {
 
     public int getPriceByName(String name) {
         try {
-            Thread.sleep(1000);
+            Thread.sleep(WAIT_TIME);
         } catch (InterruptedException e) {
             e.printStackTrace();
         }
