@@ -2,6 +2,7 @@ package com.tonyjev93.parallelprogramingsample.completablefuture;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.scheduling.concurrent.ThreadPoolTaskExecutor;
 import org.springframework.stereotype.Service;
 
 import java.util.concurrent.CompletableFuture;
@@ -15,7 +16,7 @@ import java.util.concurrent.Future;
 public class CoffeeService implements CoffeeUseCase {
 
     private final CoffeeRepository coffeeRepository;
-
+    private final ThreadPoolTaskExecutor threadPoolTaskExecutor; // Spring 에서 제공
     Executor executor = Executors.newFixedThreadPool(10);
 
     @Override
@@ -51,7 +52,7 @@ public class CoffeeService implements CoffeeUseCase {
                     log.info("supplyAsync");
                     return coffeeRepository.getPriceByName(name);
                 },
-                executor);
+                threadPoolTaskExecutor);
     }
 
     @Override
