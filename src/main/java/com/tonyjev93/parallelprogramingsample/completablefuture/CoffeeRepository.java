@@ -9,14 +9,22 @@ import java.util.Map;
 
 @Repository
 public class CoffeeRepository {
+    public static final int PRICE_OF_LATTE = 1100;
+    public static final int PRICE_OF_MOCHA = 1300;
+    public static final int PRICE_OF_AMERICANO = 900;
+    public static final String COFFE_NAME_OF_LATTE = "latte";
+    public static final String COFFE_NAME_OF_MOCHA = "mocha";
+    public static final String COFFE_NAME_OF_AMERICANO = "americano";
+
     private static final int WAIT_TIME = 1000;
+
     private Map<String, Coffee> coffeeMap = new HashMap<>();
 
     @PostConstruct
     public void init() {
-        coffeeMap.put("latte", Coffee.builder().name("latte").price(1100).build());
-        coffeeMap.put("mocha", Coffee.builder().name("mocha").price(1300).build());
-        coffeeMap.put("americano", Coffee.builder().name("americano").price(900).build());
+        coffeeMap.put(COFFE_NAME_OF_LATTE, Coffee.builder().name(COFFE_NAME_OF_LATTE).price(PRICE_OF_LATTE).build());
+        coffeeMap.put(COFFE_NAME_OF_MOCHA, Coffee.builder().name(COFFE_NAME_OF_MOCHA).price(PRICE_OF_MOCHA).build());
+        coffeeMap.put(COFFE_NAME_OF_AMERICANO, Coffee.builder().name(COFFE_NAME_OF_AMERICANO).price(PRICE_OF_AMERICANO).build());
     }
 
     public int getPriceByName(String name) {

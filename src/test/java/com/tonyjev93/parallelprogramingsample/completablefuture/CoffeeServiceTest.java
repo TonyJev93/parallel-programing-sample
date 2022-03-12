@@ -12,6 +12,8 @@ import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.Executor;
 import java.util.concurrent.Executors;
 
+import static com.tonyjev93.parallelprogramingsample.completablefuture.CoffeeRepository.COFFE_NAME_OF_LATTE;
+import static com.tonyjev93.parallelprogramingsample.completablefuture.CoffeeRepository.PRICE_OF_LATTE;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNull;
 
@@ -19,8 +21,6 @@ import static org.junit.jupiter.api.Assertions.assertNull;
 @ContextConfiguration(classes = {CoffeeRepository.class, CoffeeService.class, TaskConfig.class})
 @Slf4j
 class CoffeeServiceTest {
-    public static final String COFFEE_NAME = "latte";
-
     Executor executor = Executors.newFixedThreadPool(10);
 
     @Autowired
@@ -30,10 +30,10 @@ class CoffeeServiceTest {
     @Test
     public void test() throws Exception {
         // given
-        int expectedPrice = 1100;
+        int expectedPrice = PRICE_OF_LATTE;
 
         // when
-        int resultPrice = coffeeService.getPrice(COFFEE_NAME);
+        int resultPrice = coffeeService.getPrice(COFFE_NAME_OF_LATTE);
         log.info("최종 가격 전달 받음");
 
         //then
@@ -44,10 +44,10 @@ class CoffeeServiceTest {
     @Test
     public void test2() throws Exception {
         // given
-        int expectedPrice = 1100;
+        int expectedPrice = PRICE_OF_LATTE;
 
         // when
-        CompletableFuture<Integer> future = coffeeService.getPriceAsync(COFFEE_NAME);
+        CompletableFuture<Integer> future = coffeeService.getPriceAsync(COFFE_NAME_OF_LATTE);
         log.info("아직 최종 데이터를 전달 받지는 않았지만, 다른 작업 수행 가능");
         int resultPrice = future.join(); // 블록킹
         log.info("최종 가격 전달 받음");
@@ -61,10 +61,10 @@ class CoffeeServiceTest {
     @Test
     public void test3() throws Exception {
         // given
-        int expectedPrice = 1100;
+        int expectedPrice = PRICE_OF_LATTE;
 
         // when
-        CompletableFuture<Integer> future = coffeeService.getPriceSupplyAsync(COFFEE_NAME);
+        CompletableFuture<Integer> future = coffeeService.getPriceSupplyAsync(COFFE_NAME_OF_LATTE);
 
         log.info("아직 최종 데이터를 전달 받지는 않았지만, 다른 작업 수행 가능");
         int resultPrice = future.join(); // 블록킹
@@ -79,12 +79,12 @@ class CoffeeServiceTest {
     @Test
     public void test4() throws Exception {
         // given
-        Integer expectedPrice = 1100;
+        Integer expectedPrice = PRICE_OF_LATTE;
 
         // when
         // thenAccept : callback 함수(non-blocking 적용), CompletableFuture<Void> 반환
         // CompletableFuture 에서 콜백함수를 실행하기 때문에 join, get 을 통해 최종 연산된 데이터 조회할 필요가 없음
-        CompletableFuture<Void> future = coffeeService.getPriceSupplyAsync(COFFEE_NAME)
+        CompletableFuture<Void> future = coffeeService.getPriceSupplyAsync(COFFE_NAME_OF_LATTE)
                 .thenAccept(p -> {
                     log.info("콜백, 가격은 " + p + "원, 하지만 데이터를 반환하지는 않음");
 
@@ -103,10 +103,10 @@ class CoffeeServiceTest {
     public void test5() throws Exception {
         // given
         int additionalPrice = 100;
-        Integer expectedPrice = 1100 + additionalPrice;
+        Integer expectedPrice = PRICE_OF_LATTE + additionalPrice;
 
         // when
-        CompletableFuture<Void> future = coffeeService.getPriceSupplyAsync(COFFEE_NAME)
+        CompletableFuture<Void> future = coffeeService.getPriceSupplyAsync(COFFE_NAME_OF_LATTE)
                 .thenApply(p -> {
                     log.info("같은 쓰레드로 동작");
                     return p + 100;
@@ -129,11 +129,11 @@ class CoffeeServiceTest {
     public void test6() throws Exception {
         // given
         int additionalPrice = 100;
-        Integer expectedPrice = 1100 + additionalPrice;
+        Integer expectedPrice = PRICE_OF_LATTE + additionalPrice;
 
         // when
         // + Async : 다른 쓰레드에서 동작
-        CompletableFuture<Void> future = coffeeService.getPriceSupplyAsync(COFFEE_NAME)
+        CompletableFuture<Void> future = coffeeService.getPriceSupplyAsync(COFFE_NAME_OF_LATTE)
                 .thenApplyAsync(p -> {
                     log.info("다른 쓰레드로 동작");
                     return p + 100;

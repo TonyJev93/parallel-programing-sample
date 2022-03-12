@@ -11,18 +11,15 @@ import org.springframework.test.context.junit.jupiter.SpringExtension;
 import java.util.Arrays;
 import java.util.List;
 import java.util.concurrent.CompletableFuture;
-import java.util.concurrent.Executor;
-import java.util.concurrent.Executors;
 import java.util.stream.Collectors;
 
+import static com.tonyjev93.parallelprogramingsample.completablefuture.CoffeeRepository.*;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
 @ExtendWith(SpringExtension.class)
 @ContextConfiguration(classes = {CoffeeRepository.class, CoffeeService.class, TaskConfig.class})
 @Slf4j
 class CoffeeServiceDeepTest {
-    Executor executor = Executors.newFixedThreadPool(10);
-
     @Autowired
     private CoffeeService coffeeService;
 
@@ -30,13 +27,13 @@ class CoffeeServiceDeepTest {
     @Test
     public void test1() throws Exception {
         // given
-        Integer lattePrice = 1100;
-        Integer mochaPrice = 1300;
+        Integer lattePrice = PRICE_OF_LATTE;
+        Integer mochaPrice = PRICE_OF_MOCHA;
         Integer expectedPrice = lattePrice + mochaPrice;
 
         // when
-        CompletableFuture<Integer> futureA = coffeeService.getPriceSupplyAsync("latte");
-        CompletableFuture<Integer> futureB = coffeeService.getPriceSupplyAsync("mocha");
+        CompletableFuture<Integer> futureA = coffeeService.getPriceSupplyAsync(COFFE_NAME_OF_LATTE);
+        CompletableFuture<Integer> futureB = coffeeService.getPriceSupplyAsync(COFFE_NAME_OF_MOCHA);
 
         // thenCombine : 병렬 실행을 통한 조합, 순차적 실행 X & 2개의 CompletableFuture 조합(3개 이상은 allOf 사용)
         Integer resultPrice = futureA.thenCombine(futureB, Integer::sum).join();
@@ -50,12 +47,12 @@ class CoffeeServiceDeepTest {
     @Test
     public void test2() throws Exception {
         // given
-        Integer lattePrice = 1100;
+        Integer lattePrice = PRICE_OF_LATTE;
         double discountRate = 0.9;
         Integer expectedPrice = (int) (lattePrice * discountRate);
 
         // when
-        CompletableFuture<Integer> futureA = coffeeService.getPriceSupplyAsync("latte");
+        CompletableFuture<Integer> futureA = coffeeService.getPriceSupplyAsync(COFFE_NAME_OF_LATTE);
 
         // thenCompose : 병렬 실행을 통한 조합, 순차적 실행 O
         Integer resultPrice = futureA.thenCompose(result -> coffeeService.getDiscountPriceAsync(result)).join();
@@ -68,17 +65,17 @@ class CoffeeServiceDeepTest {
     @Test
     public void test3() throws Exception {
         // given
-        Integer lattePrice = 1100;
-        Integer mochaPrice = 1300;
-        Integer americanoPrice = 900;
+        Integer lattePrice = PRICE_OF_LATTE;
+        Integer mochaPrice = PRICE_OF_MOCHA;
+        Integer americanoPrice = PRICE_OF_AMERICANO;
 
         Integer expectedPrice = lattePrice + mochaPrice + americanoPrice;
 
 
         // when
-        CompletableFuture<Integer> futureA = coffeeService.getPriceSupplyAsync("latte");
-        CompletableFuture<Integer> futureB = coffeeService.getPriceSupplyAsync("mocha");
-        CompletableFuture<Integer> futureC = coffeeService.getPriceSupplyAsync("americano");
+        CompletableFuture<Integer> futureA = coffeeService.getPriceSupplyAsync(COFFE_NAME_OF_LATTE);
+        CompletableFuture<Integer> futureB = coffeeService.getPriceSupplyAsync(COFFE_NAME_OF_MOCHA);
+        CompletableFuture<Integer> futureC = coffeeService.getPriceSupplyAsync(COFFE_NAME_OF_AMERICANO);
 
         List<CompletableFuture<Integer>> completableFutureList = Arrays.asList(futureA, futureB, futureC);
 
