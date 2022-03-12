@@ -9,6 +9,8 @@ import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
 
 import java.util.concurrent.CompletableFuture;
+import java.util.concurrent.Executor;
+import java.util.concurrent.Executors;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNull;
@@ -18,6 +20,9 @@ import static org.junit.jupiter.api.Assertions.assertNull;
 @Slf4j
 class CoffeeServiceTest {
     public static final String COFFEE_NAME = "latte";
+
+    Executor executor = Executors.newFixedThreadPool(10);
+
     @Autowired
     private CoffeeService coffeeService;
 
@@ -86,6 +91,59 @@ class CoffeeServiceTest {
                     // then
                     assertEquals(expectedPrice, p);
                 });
+
+        log.info("아직 최종 데이터를 전달 받지는 않았지만, 다른 작업 수행 가능, 논블록킹");
+
+        // then
+        assertNull(future.join()); // 결과를 기다리기 위해 블록킹 수행 (안하면 결과를 못기다리고 테스트가 종료 됨)
+    }
+
+    @DisplayName("가격 조회 : 비동기 호출, 콜백 반환 테스트")
+    @Test
+    public void test5() throws Exception {
+        // given
+        int additionalPrice = 100;
+        Integer expectedPrice = 1100 + additionalPrice;
+
+        // when
+        CompletableFuture<Void> future = coffeeService.getPriceSupplyAsync(COFFEE_NAME)
+                .thenApply(p -> {
+                    log.info("같은 쓰레드로 동작");
+                    return p + 100;
+                })
+                .thenAccept(p -> {
+                    log.info("콜백, 가격은 " + p + "원, 하지만 데이터를 반환하지는 않음");
+
+                    // then
+                    assertEquals(expectedPrice, p);
+                });
+
+        log.info("아직 최종 데이터를 전달 받지는 않았지만, 다른 작업 수행 가능, 논블록킹");
+
+        // then
+        assertNull(future.join()); // 결과를 기다리기 위해 블록킹 수행 (안하면 결과를 못기다리고 테스트가 종료 됨)
+    }
+
+    @DisplayName("가격 조회 : 비동기 호출, 콜백 반환 테스트(다른 쓰레드)")
+    @Test
+    public void test6() throws Exception {
+        // given
+        int additionalPrice = 100;
+        Integer expectedPrice = 1100 + additionalPrice;
+
+        // when
+        // + Async : 다른 쓰레드에서 동작
+        CompletableFuture<Void> future = coffeeService.getPriceSupplyAsync(COFFEE_NAME)
+                .thenApplyAsync(p -> {
+                    log.info("다른 쓰레드로 동작");
+                    return p + 100;
+                }, executor)
+                .thenAcceptAsync(p -> {
+                    log.info("콜백, 가격은 " + p + "원, 하지만 데이터를 반환하지는 않음");
+
+                    // then
+                    assertEquals(expectedPrice, p);
+                }, executor);
 
         log.info("아직 최종 데이터를 전달 받지는 않았지만, 다른 작업 수행 가능, 논블록킹");
 
