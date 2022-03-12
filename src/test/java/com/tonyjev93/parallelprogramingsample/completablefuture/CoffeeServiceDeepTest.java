@@ -35,8 +35,27 @@ class CoffeeServiceDeepTest {
         CompletableFuture<Integer> futureA = coffeeService.getPriceSupplyAsync("latte");
         CompletableFuture<Integer> futureB = coffeeService.getPriceSupplyAsync("mocha");
 
-        // thenCombine : 병렬 실행을 통한 조합, 순차적 실행 X
+        // thenCombine : 병렬 실행을 통한 조합, 순차적 실행 X & 2개의 CompletableFuture 조합(3개 이상은 allOf 사용)
         Integer resultPrice = futureA.thenCombine(futureB, Integer::sum).join();
+
+        // then
+        assertEquals(expectedPrice, resultPrice);
+    }
+
+
+    @DisplayName("(중급)가격 조회 : 병렬 조회 및 조합(compose - 순차적 실행 O)")
+    @Test
+    public void test2() throws Exception {
+        // given
+        Integer lattePrice = 1100;
+        double discountRate = 0.9;
+        Integer expectedPrice = (int) (lattePrice * discountRate);
+
+        // when
+        CompletableFuture<Integer> futureA = coffeeService.getPriceSupplyAsync("latte");
+
+        // thenCombine : 병렬 실행을 통한 조합, 순차적 실행 X
+        Integer resultPrice = futureA.thenCompose(result -> coffeeService.getDiscountPriceAsync(result)).join();
 
         // then
         assertEquals(expectedPrice, resultPrice);

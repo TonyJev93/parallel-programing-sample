@@ -1,5 +1,6 @@
 package com.tonyjev93.parallelprogramingsample.completablefuture;
 
+import com.tonyjev93.parallelprogramingsample.util.ThreadUtils;
 import org.springframework.stereotype.Repository;
 
 import javax.annotation.PostConstruct;
@@ -8,7 +9,7 @@ import java.util.Map;
 
 @Repository
 public class CoffeeRepository {
-    public static final int WAIT_TIME = 1000;
+    private static final int WAIT_TIME = 1000;
     private Map<String, Coffee> coffeeMap = new HashMap<>();
 
     @PostConstruct
@@ -19,12 +20,7 @@ public class CoffeeRepository {
     }
 
     public int getPriceByName(String name) {
-        try {
-            Thread.sleep(WAIT_TIME);
-        } catch (InterruptedException e) {
-            e.printStackTrace();
-        }
-
+        ThreadUtils.sleep(WAIT_TIME);
         return coffeeMap.get(name).getPrice();
     }
 }

@@ -1,5 +1,6 @@
 package com.tonyjev93.parallelprogramingsample.completablefuture;
 
+import com.tonyjev93.parallelprogramingsample.util.ThreadUtils;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.scheduling.concurrent.ThreadPoolTaskExecutor;
@@ -8,13 +9,13 @@ import org.springframework.stereotype.Service;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.Executor;
 import java.util.concurrent.Executors;
-import java.util.concurrent.Future;
 
 @Slf4j
 @Service
 @RequiredArgsConstructor
 public class CoffeeService implements CoffeeUseCase {
 
+    public static final double DISCOUNT_RATE = 0.9;
     private final CoffeeRepository coffeeRepository;
     private final ThreadPoolTaskExecutor threadPoolTaskExecutor; // Spring 에서 제공
     Executor executor = Executors.newFixedThreadPool(10);
@@ -49,14 +50,18 @@ public class CoffeeService implements CoffeeUseCase {
         // 일반적으로 commonPool 을 사용하는 방법은 바람직하지 않음.
         // executor 파라미터 추가를 통해 commonPool 을 사용하지 않고 별도의 쓰레드 풀을 사용.
         return CompletableFuture.supplyAsync(() -> {
-                    log.info("supplyAsync");
+                    log.info("getPriceSupplyAsync : supplyAsync");
                     return coffeeRepository.getPriceByName(name);
                 },
                 threadPoolTaskExecutor);
     }
 
     @Override
-    public Future<Integer> getDiscountPriceAsync(Integer price) {
-        return null;
+    public CompletableFuture<Integer> getDiscountPriceAsync(Integer price) {
+        return CompletableFuture.supplyAsync(() -> {
+            log.info("getDiscountPriceAsync : supplyAsync");
+            ThreadUtils.sleep(1000);
+            return (int) (price * DISCOUNT_RATE);
+        }, threadPoolTaskExecutor);
     }
 }
