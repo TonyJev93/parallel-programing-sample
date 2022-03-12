@@ -41,6 +41,18 @@ public class CoffeeService implements CoffeeUseCase {
     }
 
     @Override
+    public CompletableFuture<Integer> getPriceSupplyAsync(String name) {
+        log.info("비동기 호출 방식으로 가격 조회 시작");
+
+        // Thread = ForkJoinPool.commonPool-worker-XX 사용
+        // 일반적으로 commonPool 을 사용하는 방법은 바람직하지 않음.
+        return CompletableFuture.supplyAsync(() -> {
+            log.info("supplyAsync");
+            return coffeeRepository.getPriceByName(name);
+        });
+    }
+
+    @Override
     public Future<Integer> getDiscountPriceAsync(Integer price) {
         return null;
     }

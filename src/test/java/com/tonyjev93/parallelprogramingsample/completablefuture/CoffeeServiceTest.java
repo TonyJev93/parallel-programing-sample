@@ -50,4 +50,22 @@ class CoffeeServiceTest {
         assertEquals(expectedPrice, resultPrice);
 
     }
+
+    @DisplayName("가격 조회 : 비동기, 블록킹 호출 테스트(supplyAsync)")
+    @Test
+    public void test3() throws Exception {
+        // given
+        String coffeeName = "latte";
+        int expectedPrice = 1100;
+        // when
+        CompletableFuture<Integer> future = coffeeService.getPriceSupplyAsync(coffeeName);
+
+        log.info("아직 최종 데이터를 전달 받지는 않았지만, 다른 작업 수행 가능");
+        int resultPrice = future.join(); // 블록킹
+        log.info("최종 가격 전달 받음");
+
+        //then
+        assertEquals(expectedPrice, resultPrice);
+
+    }
 }
