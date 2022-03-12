@@ -17,7 +17,7 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNull;
 
 @ExtendWith(SpringExtension.class)
-@ContextConfiguration(classes = {CoffeeRepository.class, CoffeeService.class, ThreadPoolTaskExecutor.class})
+@ContextConfiguration(classes = {CoffeeRepository.class, CoffeeService.class, TaskConfig.class})
 @Slf4j
 class CoffeeServiceTest {
     public static final String COFFEE_NAME = "latte";
