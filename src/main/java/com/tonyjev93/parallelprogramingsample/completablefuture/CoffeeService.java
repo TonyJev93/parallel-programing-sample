@@ -44,12 +44,14 @@ public class CoffeeService implements CoffeeUseCase {
     public CompletableFuture<Integer> getPriceSupplyAsync(String name) {
         log.info("비동기 호출 방식으로 가격 조회 시작");
 
-        // Thread = ForkJoinPool.commonPool-worker-XX 사용
+        // executor 파라미터 추가 전 : Thread = ForkJoinPool.commonPool-worker-XX 사용
         // 일반적으로 commonPool 을 사용하는 방법은 바람직하지 않음.
+        // executor 파라미터 추가를 통해 commonPool 을 사용하지 않고 별도의 쓰레드 풀을 사용.
         return CompletableFuture.supplyAsync(() -> {
-            log.info("supplyAsync");
-            return coffeeRepository.getPriceByName(name);
-        });
+                    log.info("supplyAsync");
+                    return coffeeRepository.getPriceByName(name);
+                },
+                executor);
     }
 
     @Override
